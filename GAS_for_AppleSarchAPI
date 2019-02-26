@@ -1,0 +1,18 @@
+function myFunction(){
+   var response = UrlFetchApp.fetch('https://itunes.apple.com/lookup?id=1187265767&country=JP');
+   //パースさせる
+   var json=JSON.parse(response.getContentText());
+   Logger.log(json["resultCount"]);
+   Logger.log(json["results"][0]["ipadScreenshotUrls"]);
+   Logger.log(json["results"][0]["screenshotUrls"][0]);
+  //特殊文字は\(バックスラッシュ)で対応が必要
+   var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][1] + "\")"
+   Logger.log(func);
+  //スプレッドシートを取得
+  var sheet = SpreadsheetApp.getActiveSheet();
+//  sheet.getRange('A'+(sheet.getLastRow()+1)).setFormula('=GoogleFinance("GOOG","price")');
+  //sheet.getRange('A1').setFormula('=IMAGE("http://a2.mzstatic.com/jp/r30/Purple117/v4/16/37/4f/16374f60-f3e0-3493-4ad9-8a5ade7a96a9/sc1024x768.jpeg")');
+//  sheet.getRange('A'+(sheet.getLastRow()+1)).setFormula('=IMAGE("http://a2.mzstatic.com/jp/r30/Purple117/v4/16/37/4f/16374f60-f3e0-3493-4ad9-8a5ade7a96a9/sc1024x768.jpeg")');
+    sheet.getRange('A2').setFormula('=IMAGE("https://is1-ssl.mzstatic.com/image/thumb/Purple118/v4/52/62/6c/52626c10-3458-4a3e-2097-ce0c0c39f9cb/source/392x696bb.jpg")');
+    sheet.getRange('A3').setFormula(func)
+}
