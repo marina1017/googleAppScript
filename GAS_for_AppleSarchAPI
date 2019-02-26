@@ -1,18 +1,67 @@
+//function helloStandAlone() {
+//  var userEmail = Session.getActiveUser().getEmail();
+//  var id = "1NtEOGYrWJqwAiaOEtoeaXFrefvA6ka8_niCkJAuU9hY";  
+//  var spreadSheet = SpreadsheetApp.openById(id);  
+// 
+//  //log  
+//  spreadSheet.getSheetByName('log').appendRow(['helloStandAlone()' , 'ここは配列なので', '自由に追加！']);
+//
+//  var response = UrlFetchApp.fetch("https://m.yahoo.co.jp/");
+//
+//  var myRegexp = /<title>([\s\S]*?)<\/title>/i;
+//  var match = myRegexp.exec(response.getContentText());
+//  var title = match[1];
+//
+//  title = title.replace(/(^\s+)|(\s+$)/g, "");
+//  Logger.log(title);
+//  
+//}
+
+//九九を書く
+//function myFunction(){
+//  var sheet = SpreadsheetApp.getActiveSheet()
+//  for(var i = 1;i<10;i++){
+//    for(var j = 1;j<10;j++){
+//      sheet.getRange(i, j).setValue(i*j);
+//    }
+//  }
+//  for(var i = 1; i<10;i++){
+//    var rowTotal = 0;
+//    var colTotal = 0;
+//    for(var j= 1; j<10;j++) {
+//      //値の取り出し
+//      rowTotal += sheet.getRange(i, j).getValue()
+//      colTotal += sheet.getRange(j, i).getValue()
+//    }
+//    sheet.getRange(i, 10).setValue(rowTotal)
+//    sheet.getRange(10, i).setValue(colTotal)
+//  }
+//}
+
 function myFunction(){
    var response = UrlFetchApp.fetch('https://itunes.apple.com/lookup?id=1187265767&country=JP');
    //パースさせる
    var json=JSON.parse(response.getContentText());
    Logger.log(json["resultCount"]);
+  
+   Logger.log(json["results"][0]["trackCensoredName"]);
    Logger.log(json["results"][0]["ipadScreenshotUrls"]);
    Logger.log(json["results"][0]["screenshotUrls"][0]);
+  　　Logger.log(json["results"][0]["screenshotUrls"].length);
+   var counts = json["results"][0]["screenshotUrls"].length
+  
   //特殊文字は\(バックスラッシュ)で対応が必要
-   var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][1] + "\")"
-   Logger.log(func);
+//   var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][1] + "\")"
+//   Logger.log(func);
   //スプレッドシートを取得
   var sheet = SpreadsheetApp.getActiveSheet();
 //  sheet.getRange('A'+(sheet.getLastRow()+1)).setFormula('=GoogleFinance("GOOG","price")');
   //sheet.getRange('A1').setFormula('=IMAGE("http://a2.mzstatic.com/jp/r30/Purple117/v4/16/37/4f/16374f60-f3e0-3493-4ad9-8a5ade7a96a9/sc1024x768.jpeg")');
 //  sheet.getRange('A'+(sheet.getLastRow()+1)).setFormula('=IMAGE("http://a2.mzstatic.com/jp/r30/Purple117/v4/16/37/4f/16374f60-f3e0-3493-4ad9-8a5ade7a96a9/sc1024x768.jpeg")');
-    sheet.getRange('A2').setFormula('=IMAGE("https://is1-ssl.mzstatic.com/image/thumb/Purple118/v4/52/62/6c/52626c10-3458-4a3e-2097-ce0c0c39f9cb/source/392x696bb.jpg")');
-    sheet.getRange('A3').setFormula(func)
+//    sheet.getRange('A3').setFormula(func)
+    
+    for(var cellNumber = 1; cellNumber<=counts; cellNumber++){
+       var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][cellNumber] + "\")"
+       sheet.getRange(1, cellNumber).setFormula(func)
+    }
 }
