@@ -1,36 +1,99 @@
 //検索したいappIDをいれておく
-var appIDs = [1187265767,396855834]
+var appIDs = [363590051,333903271,972909677,443904275]
 
 function myFunction(){
   var appCount = appIDs.length
   
+  var lustCellNumber = 0
   
+  //すべて終わるまでループ
+  for(var appNumber = 1; appNumber <= appCount; appNumber++){
+  　　　　//APIをたたく
+    var response = UrlFetchApp.fetch("https://itunes.apple.com/lookup?id="+appIDs[appNumber-1]+ "&country=US");
+    //パースさせる
+    var json=JSON.parse(response.getContentText());
   
-   var response = UrlFetchApp.fetch('https://itunes.apple.com/lookup?id=1187265767&country=JP');
-   //パースさせる
-   var json=JSON.parse(response.getContentText());
-
-   Logger.log(json["results"][0]["trackCensoredName"]);
-  　　Logger.log(json["results"][0]["description"]);
-   var screenshotsCounts = json["results"][0]["screenshotUrls"].length
-  
-  //スプレッドシートを取得
-  var sheet = SpreadsheetApp.getActiveSheet();
-  
-  //タイトルをスプレッドシートにいれる
-  sheet.getRange(1, 1).setValue(json["results"][0]["trackCensoredName"])
-  
-  //説明をスプレッドシートに入れる
-  sheet.getRange(1, 2).setValue(json["results"][0]["description"])
-  sheet.getRange(1, 2).setWrap(true)
-  sheet.getRange(1, 2).setFontSize(5)
+  　　　　//スプレッドシートを取得
+    var sheet = SpreadsheetApp.getActiveSheet();
     
-    for(var screenshotsNumber = 1; screenshotsNumber <= screenshotsCounts; screenshotsNumber++){
-       var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][screenshotsNumber] + "\")"
-       sheet.getRange(1, 2 + screenshotsNumber).setFormula(func)
-    }
+    //セルの高さを固定する
+    sheet.setRowHeight(appNumber, 200);
   
-  //説明文を入れるセルの列幅を固定値にする
-  sheet.setColumnWidth(2, 400)
+    //////////////////////////////////////////////////////////////////////////////
+    //1行目*タイトルについて*
+    //APIからかえってきたアプリのタイトルをスプレッドシートにいれる
+    sheet.getRange(appNumber, 1).setValue(json["results"][0]["trackCensoredName"])
+    //現在の列の位置を記録
+    lustCellNumber += 1
+    
+  　　　　//////////////////////////////////////////////////////////////////////////////
+    //2行目*説明について*
+    //APIからかえってきたアプリの説明をスプレッドシートに入れる
+    sheet.getRange(appNumber, 2).setValue(json["results"][0]["description"])
+    //セルの折返しを設定する
+    sheet.getRange(appNumber, 2).setWrap(true)
+    //セルのフォントサイズを指定する
+    sheet.getRange(appNumber, 2).setFontSize(5)
+    //説明文を入れるセルの列幅を固定値にする
+    sheet.setColumnWidth(2, 400)
+    //現在の列の位置を記録
+    lustCellNumber += 1
+    
+    //////////////////////////////////////////////////////////////////////////////
+    //3行目以降*iPhoneスクリーンショットについて*
+    //取得したスクリーンショットの数を数える
+    var screenshotsCounts = json["results"][0]["screenshotUrls"].length
+    
+    //APIから帰ってきたiPhoneのスクリーンショットの数を習得し、そのぶんだけループを回す
+    for(var screenshotsNumber = 0; screenshotsNumber <= screenshotsCounts; screenshotsNumber++){
+      　　//セルに入力させる文字列を作る
+       var func = "IMAGE(\"" + json["results"][0]["screenshotUrls"][screenshotsNumber] + "\")"
+       //指定したセルに、作った文字列と関数を入れる
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setFormula(func)
+       //指定したセルを中央揃えにする
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setHorizontalAlignment('center');
+      //指定したセルの横の長さを固定する
+       sheet.setColumnWidth( lustCellNumber + 1 + screenshotsNumber, 150)
+    }
+    //現在の列の位置を記録
+    lustCellNumber += screenshotsCounts
+    
+    //////////////////////////////////////////////////////////////////////////////
+    //*iPadスクリーンショットについて*
+    var iPadScreenshotsCounts = json["results"][0]["ipadScreenshotUrls"].length
+    
+    //APIから帰ってきたiPadのスクリーンショットの数を習得し、そのぶんだけループを回す
+    for(var screenshotsNumber = 0; screenshotsNumber <= iPadScreenshotsCounts; screenshotsNumber++){
+      　　//セルに入力させる文字列を作る
+       var func = "IMAGE(\"" + json["results"][0]["ipadScreenshotUrls"][screenshotsNumber] + "\")"
+       //指定したセルに、作った文字列と関数を入れる
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setFormula(func)
+       //指定したセルを中央揃えにする
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setHorizontalAlignment('center');
+      //指定したセルの横の長さを固定する
+       sheet.setColumnWidth( lustCellNumber + 1 + screenshotsNumber, 150)
+    }
+    //現在の列の位置を記録
+    lustCellNumber += iPadScreenshotsCounts
+    
+    //////////////////////////////////////////////////////////////////////////////
+    //*appleTVスクリーンショットについて*
+    var tvScreenshotsCounts = json["results"][0]["appletvScreenshotUrls"].length
+    
+    //APIから帰ってきたiPadのスクリーンショットの数を習得し、そのぶんだけループを回す
+    for(var screenshotsNumber = 0; screenshotsNumber <= tvScreenshotsCounts; screenshotsNumber++){
+      　　//セルに入力させる文字列を作る
+       var func = "IMAGE(\"" + json["results"][0]["appletvScreenshotUrls"][screenshotsNumber] + "\")"
+       //指定したセルに、作った文字列と関数を入れる
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setFormula(func)
+       //指定したセルを中央揃えにする
+       sheet.getRange(appNumber, lustCellNumber + 1 + screenshotsNumber).setHorizontalAlignment('center');
+      //指定したセルの横の長さを固定する
+       sheet.setColumnWidth( lustCellNumber + 1 + screenshotsNumber, 150)
+    }
+    
+    //現在の列の位置をリセット
+    lustCellNumber = 0
+  }
   
 }
